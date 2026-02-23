@@ -2,49 +2,53 @@ import tkinter as tk
 from tkinter import messagebox
 import subprocess
 
-# Function to execute the scraper script
+# --- Functions ---
 def run_scraper():
     try:
-        # Runs the scraper.py file using the python interpreter
         subprocess.run(["python", "scraper.py"], check=True)
-        messagebox.showinfo("Success", "Data scraped and saved to Excel successfully! ✅")
+        messagebox.showinfo("Success", "Data updated! ✅")
     except Exception as e:
-        messagebox.showerror("Error", f"An error occurred: {e}")
+        messagebox.showerror("Error", f"Scraper failed: {e}")
 
-# Function to execute the analyzer script
 def run_analyzer():
     try:
-        # Runs the analyzer.py file to generate the chart
         subprocess.run(["python", "analyzer.py"], check=True)
     except Exception as e:
-        messagebox.showerror("Error", f"Could not create chart: {e}")
+        messagebox.showerror("Error", f"Analyzer failed: {e}")
+
+def run_ai_prediction():
+    try:
+        # This calls your new AI script
+        subprocess.run(["python", "ai_predictor.py"], check=True)
+    except Exception as e:
+        messagebox.showerror("Error", f"AI module failed: {e}")
 
 # --- UI Setup ---
-
-# Create the main application window
 window = tk.Tk()
-window.title("Sensor Data Management Pro")
-window.geometry("400x350")
-window.configure(bg="#f4f4f4")
+window.title("Engineering Smart Monitor")
+window.geometry("400x480")
+window.configure(bg="#f0f2f5")
 
-# App Header
-header = tk.Label(window, text="Scraping & Analysis Tool", 
-                  font=("Arial", 16, "bold"), bg="#f4f4f4", fg="#333")
+header = tk.Label(window, text="AI-Powered Sensor Tool", 
+                  font=("Arial", 16, "bold"), bg="#f0f2f5", fg="#1a73e8")
 header.pack(pady=25)
 
-# Button to trigger Scraping
-btn_scrape = tk.Button(window, text="1. Fetch Latest Prices", command=run_scraper, 
-                       width=25, height=2, bg="#2ecc71", fg="white", font=("Arial", 10, "bold"))
+# Button 1
+btn_scrape = tk.Button(window, text="1. Update Latest Data", command=run_scraper, 
+                       width=25, height=2, bg="#34a853", fg="white", font=("Arial", 10, "bold"))
 btn_scrape.pack(pady=10)
 
-# Button to trigger Analysis/Chart
-btn_analyze = tk.Button(window, text="2. Show Price Analysis", command=run_analyzer, 
-                        width=25, height=2, bg="#3498db", fg="white", font=("Arial", 10, "bold"))
+# Button 2
+btn_analyze = tk.Button(window, text="2. Show Current Analysis", command=run_analyzer, 
+                        width=25, height=2, bg="#4285f4", fg="white", font=("Arial", 10, "bold"))
 btn_analyze.pack(pady=10)
 
-# Footer label
-footer = tk.Label(window, text="Ready to process data", bg="#f4f4f4", fg="#888")
-footer.pack(side="bottom", pady=10)
+# Button 3: THE AI BUTTON!
+btn_ai = tk.Button(window, text="3. AI Future Forecasting", command=run_ai_prediction, 
+                        width=25, height=2, bg="#fbbc05", fg="black", font=("Arial", 10, "bold"))
+btn_ai.pack(pady=10)
 
-# Start the GUI event loop
+footer = tk.Label(window, text="Status: Connected to AI Engine", bg="#f0f2f5", fg="#5f6368")
+footer.pack(side="bottom", pady=20)
+
 window.mainloop()
