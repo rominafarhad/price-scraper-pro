@@ -1,38 +1,58 @@
-import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
-import pandas as pd
+import numpy as np
+import telebot
 
-def predict_future_price():
-    # 1. Simulating 100 days of price history for a sensor
-    # In a real project, this data comes from your 'sensors_data.csv'
-    days = np.array(range(1, 101)).reshape(-1, 1)
-    
-    # Let's assume price has a slight upward trend with some noise
-    prices = 150000 + (days * 500) + np.random.normal(0, 5000, days.shape)
+# --- Telegram API Configuration ---
+BOT_TOKEN = "8658812603:AAGjimnoBlITXegCZXpsX_994itBFms_CVc"
+CHAT_ID = "878211169"
+bot = telebot.TeleBot(BOT_TOKEN)
 
-    # 2. Creating the AI Model (Linear Regression)
-    # This is the same logic used in Smart Grids for Load Forecasting
-    model = LinearRegression()
-    model.fit(days, prices) # Training the brain!
+def run_ai_analysis():
+    """
+    Loads historical sensor data, trains a Linear Regression model,
+    and predicts future values with automated alerting.
+    """
+    try:
+        # 1. Data Acquisition
+        df = pd.read_csv('sensor_data.csv', names=['Time', 'Value'])
+        
+        # 2. Feature Engineering (Using index as time-series sequence)
+        X = np.array(range(len(df))).reshape(-1, 1)
+        y = df['Value'].values
 
-    # 3. Predicting for the next 10 days
-    future_days = np.array(range(101, 111)).reshape(-1, 1)
-    predicted_prices = model.predict(future_days)
+        # 3. Model Training (Machine Learning)
+        model = LinearRegression()
+        model.fit(X, y)
 
-    # 4. Visualizing the Result
-    plt.figure(figsize=(10, 5))
-    plt.scatter(days, prices, color='blue', label='Actual Past Prices', s=10)
-    plt.plot(future_days, predicted_prices, color='red', linewidth=3, label='AI Prediction')
-    plt.title('Engineering Analysis: Sensor Price Forecasting')
-    plt.xlabel('Days')
-    plt.ylabel('Price (Tomans)')
-    plt.legend()
-    plt.grid(True)
-    
-    plt.savefig('ai_prediction_chart.png')
-    print("🚀 AI Prediction Complete! Chart saved.")
-    plt.show()
+        # 4. Forecasting: Predict the next 3 steps
+        future_steps = 3
+        future_index = np.array(range(len(df), len(df) + future_steps)).reshape(-1, 1)
+        predictions = model.predict(future_index)
+
+        # 5. Alert System: Check if predicted values exceed threshold
+        threshold = 283.0
+        if predictions[-1] > threshold:
+            alert_msg = f"🚩 AI ALERT: Predicted value ({predictions[-1]:.2f}) exceeds threshold ({threshold})!"
+            bot.send_message(CHAT_ID, alert_msg)
+            print("Telegram Notification Dispatched! 🚨")
+
+        # 6. Visualization (Data Science Dashboard)
+        plt.style.use('ggplot')
+        plt.figure(figsize=(10, 6))
+        plt.plot(df.index, y, label='Historical Data', color='#3498db', marker='o')
+        plt.plot(future_index, predictions, label='AI Forecast', color='#e74c3c', linestyle='--', marker='s')
+        
+        plt.title("Industrial Monitoring System - AI Forecasting")
+        plt.xlabel("Sequence Number")
+        plt.ylabel("Sensor Value (Units)")
+        plt.legend()
+        plt.grid(True)
+        plt.show()
+
+    except Exception as e:
+        print(f"Analysis Failed: Ensure the CSV contains sufficient data points. Error: {e}")
 
 if __name__ == "__main__":
-    predict_future_price()
+    run_ai_analysis()
